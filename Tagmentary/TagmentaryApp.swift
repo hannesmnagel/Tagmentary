@@ -13,6 +13,7 @@ struct TagmentaryApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Event.self,
+            Tag.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

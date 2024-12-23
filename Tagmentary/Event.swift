@@ -11,26 +11,18 @@ import SwiftData
 @Model
 final class Event {
     var timestamp: Date
-    var numericValues: [String : Double]
-    var stringValues: [String : String]
+    var numericValues: [NumericValue]
 
     @Relationship(deleteRule: .noAction, inverse: \Tag.events) var tags: [Tag]
 
-    init(timestamp: Date, numericValues: [String : Double], stringValues: [String : String], tags: [Tag]) {
+    init(timestamp: Date, numericValues: [NumericValue]) {
         self.timestamp = timestamp
         self.numericValues = numericValues
-        self.stringValues = stringValues
-        self.tags = tags
+        self.tags = []
+    }
+    struct NumericValue: Codable, Hashable {
+        var key: String
+        var value: Double
     }
 }
 
-@Model
-final class Tag {
-    var name: String
-    @Relationship(deleteRule: .noAction) var events: [Event]
-
-    init(name: String, events: [Event]) {
-        self.name = name
-        self.events = events
-    }
-}

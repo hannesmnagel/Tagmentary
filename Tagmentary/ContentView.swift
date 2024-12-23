@@ -14,20 +14,34 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView {
-            List {
-                ForEach(tags) { tag in
-                    NavigationLink {
-                        Text(tag.name)
-                    } label: {
-                        Text(tag.name)
+            ScrollView{
+                LazyVGrid(columns: [.init(.adaptive(minimum: 100, maximum: 300))]) {
+                    ForEach(tags) { tag in
+                        NavigationLink {
+                            TagDetailView(tag: tag)
+                        } label: {
+                            TagOverview(tag: tag)
+                        }
+                        .contextMenu {
+                            Button(
+                                "Delete Tag \(tag.name)",
+                                systemImage: "trash",
+                                role: .destructive
+                            ){
+                                modelContext.delete(tag)
+                            }
+                        }
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .padding(.horizontal)
+                Button("Delete All", systemImage: "trash", role: .destructive){
+                    try? modelContext.delete(model: Event.self)
+                    try? modelContext.delete(model: Tag.self)
+                }
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.capsule)
             }
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
                 ToolbarItem {
                     Button(action: addItem) {
                         Label("Add Item", systemImage: "plus")
@@ -41,8 +55,15 @@ struct ContentView: View {
 
     private func addItem() {
         withAnimation {
-            let newItem = Tag(name: "New Tag", events: [])
-            modelContext.insert(newItem)
+            let tag = Tag(name: "New Tag")
+            modelContext.insert(tag)
+            tag.events = [
+                Event(timestamp: .now, numericValues: [.init(key: "num", value: .random(in: 0...5))]),
+                Event(timestamp: .now-3600*24, numericValues: [.init(key: "num", value: .random(in: 0...5))])
+            ].map {
+                modelContext.insert($0)
+                return $0
+            }
         }
     }
 
@@ -59,3 +80,5 @@ struct ContentView: View {
     ContentView()
         .modelContainer(for: Event.self, inMemory: true)
 }
+
+
