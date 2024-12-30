@@ -82,8 +82,11 @@ struct AddEventView: View {
                 .font(.headline)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Divider()
-            TextField("Value", value: $value, format: .number)
-                .textFieldStyle(.roundedBorder)
+                Stepper(value: $value) {
+                    TextField("Value", value: $value, format: .number)
+                        .textFieldStyle(.roundedBorder)
+                        .keyboardType(.decimalPad)
+                }
             Spacer()
             Button("Add") {
                 addEvent()
