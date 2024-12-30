@@ -9,9 +9,9 @@ import SwiftUI
 import SwiftData
 
 @Model
-final class Tag {
-    var name: String
-    @Relationship(deleteRule: .noAction) var events: [Event]
+final class Tag: Equatable {
+    @Attribute(.unique) var name: String
+    @Relationship(deleteRule: .cascade, inverse: \Event.storedTag) var events: [Event]
 
     init(name: String) {
         self.name = name

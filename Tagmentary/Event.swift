@@ -7,22 +7,19 @@
 
 import Foundation
 import SwiftData
+import Charts
 
 @Model
 final class Event {
     var timestamp: Date
-    var numericValues: [NumericValue]
+    @Relationship(deleteRule: .nullify) var storedTag: Tag?
+    var value: Double
+    var tag: Tag { get{ storedTag! } set { storedTag = newValue } }
 
-    @Relationship(deleteRule: .noAction, inverse: \Tag.events) var tags: [Tag]
-
-    init(timestamp: Date, numericValues: [NumericValue]) {
+    init(timestamp: Date, tag: Tag, value: Double) {
         self.timestamp = timestamp
-        self.numericValues = numericValues
-        self.tags = []
-    }
-    struct NumericValue: Codable, Hashable {
-        var key: String
-        var value: Double
+        self.storedTag = tag
+        self.value = value
     }
 }
 
