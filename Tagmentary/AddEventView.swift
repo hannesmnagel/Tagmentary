@@ -98,6 +98,7 @@ struct AddEventView: View {
         guard let associatedTag else { return }
         let event = Event(timestamp: date, tag: associatedTag, value: value)
         modelContext.insert(event)
+        trackEvent("added event", with: ["event count for this tag" : associatedTag.events.count])
         dismiss()
     }
 }

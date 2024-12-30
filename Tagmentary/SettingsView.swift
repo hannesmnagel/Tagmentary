@@ -23,7 +23,6 @@ struct SettingsView: View {
                     .listRowBackground(Color.clear)
             }
             Section("Chart Settings"){
-
                 HStack{
                     Text("X Axis Zoom")
                     Slider(value: $xAxisZoom, in: 1...50)
@@ -38,6 +37,7 @@ struct SettingsView: View {
                     generateSampleData(coffeeTag: coffeeTag, sleepTag: sleepTag).forEach { event in
                         modelContext.insert(event)
                     }
+                    trackEvent("added sample data")
                 }
                 Toggle("Track sleep data automatically", isOn: $trackSleepData)
                     .task(id: trackSleepData) {
@@ -47,13 +47,17 @@ struct SettingsView: View {
                                     HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
                                 ])
                                 try await healthDataManager.observeSleepData()
+                                trackEvent("tracking sleep data")
                             } catch {
+                                trackEvent("tracking sleep failed", with: ["error" : String(describing: error)])
                                 trackSleepData = false
                             }
                         } else {
                             do {
                                 try await healthDataManager.stopObservingSleepData()
+                                trackEvent("stopped tracking sleep")
                             } catch {
+                                trackEvent("stopped tracking sleep failed", with: ["error" : String(describing: error)])
                                 trackSleepData = true
                             }
                         }
@@ -63,12 +67,13 @@ struct SettingsView: View {
             Button("Delete Everything", systemImage: "trash", role: .destructive) {
                 try? modelContext.delete(model: Event.self)
                 try? modelContext.delete(model: Tag.self)
+                trackEvent("deleted everything")
             }
             .foregroundStyle(.red)
             Section("log"){
-            Text(logs)
-            Button("Clear logs"){UserDefaults.standard.removeObject(forKey: "log")}
-        }
+                Text(logs)
+                Button("Clear logs"){UserDefaults.standard.removeObject(forKey: "log")}
+            }
         }
     }
     private func generateSampleData(coffeeTag: Tag, sleepTag: Tag) -> [Event] {
@@ -96,30 +101,6 @@ struct SettingsView: View {
         }
 
         return events
-    }
-    // Import sleep data from HealthKit and save to the model context
-    private func importSleepData() async {
-        let tag = Tag(name: "Sleep")
-        modelContext.insert(tag)
-        let startDate = Calendar.current.date(byAdding: .month, value: -5, to: .now)!
-        let sleepData = await stride(from: startDate, to: .now, by: 3600*24).asyncMap {
-            let sleepData = try? await healthDataManager.fetchSleepData(fromNightEndingOn: $0)
-            print(sleepData as Any)
-            if !(sleepData?.total.isZero ?? true) {
-print("-----------------------------------------------------------------------------------------------")
-            }
-            return ($0, sleepData?.total)
-        }
-        sleepData.forEach { sleepData in
-            if let duration = sleepData.1, duration > 0 {
-                let event = Event(
-                    timestamp: sleepData.0,
-                    tag: tag,
-                    value: duration
-                )
-                modelContext.insert(event)
-            }
-        }
     }
 }
 
