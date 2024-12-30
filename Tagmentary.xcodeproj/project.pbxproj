@@ -304,6 +304,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Tagmentary/Info.plist;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Your health data is used to display it in this app";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Your health data is used to display it in this app";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -336,6 +337,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Tagmentary/Info.plist;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Your health data is used to display it in this app";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Your health data is used to display it in this app";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

@@ -144,68 +144,73 @@ struct ContentView: View {
                 .buttonBorderShape(.capsule)
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            if xAxis == nil {
-                Text("Select a Tag to show on the X axis")
-                    .padding(.top)
-            } else if yAxis.isEmpty {
-                Text("Select Tags to compare to")
-                    .padding(.top)
-            }
-            ScrollView(.horizontal){
-                HStack{
-                    if let xAxis, !tags.isEmpty{
-                        Button{
-                            if yAxis.isEmpty {
-                                yAxis = Set(tags).subtracting(Set([xAxis]))
-                            } else {
-                                yAxis.removeAll()
-                            }
-                        } label: {
-                            Text(yAxis.isEmpty ? "All" : "None")
-                                .frame(maxWidth: .infinity)
-                                .padding(2)
-                        }
-                        .buttonStyle(.bordered)
-                        .buttonBorderShape(.capsule)
-                        .padding(2)
-                    }
-                    ForEach(tags.filter{$0 != xAxis}){tag in
-                        let tagState : TagState = xAxis == tag ? .x : yAxis.contains(tag) ? .y : .none
-                        Button{
-                            if xAxis == nil {
-                                yAxis.remove(tag)
-                                xAxis = tag
-                            } else if yAxis.contains(tag) {
-                                yAxis.remove(tag)
-                            } else {
-                                yAxis.insert(tag)
-                            }
-                        } label: {
-                            HStack{
-                                Text(tag.name)
-                                if xAxis != nil {
-                                    Spacer()
-                                    Text(tagState == .x ? "X" : tagState == .y ? "Y" : "")
+            .padding(.horizontal, 10)
+            if tags.isEmpty {
+                ContentUnavailableView("No Tags", systemImage: "mappin.circle", description: Text("Add some Tags or configure automatic sleep imports in Settings"))
+            } else {
+                if xAxis == nil {
+                    Text("Select a Tag to show on the X axis")
+                        .padding(.top)
+                } else if yAxis.isEmpty {
+                    Text("Select Tags to compare to")
+                        .padding(.top)
+                }
+                ScrollView(.horizontal){
+                    HStack{
+                        if let xAxis, !tags.isEmpty{
+                            Button{
+                                if yAxis.isEmpty {
+                                    yAxis = Set(tags).subtracting(Set([xAxis]))
+                                } else {
+                                    yAxis.removeAll()
                                 }
+                            } label: {
+                                Text(yAxis.isEmpty ? "All" : "None")
+                                    .frame(maxWidth: .infinity)
+                                    .padding(2)
                             }
-                            .frame(maxWidth: .infinity)
+                            .buttonStyle(.bordered)
+                            .buttonBorderShape(.capsule)
                             .padding(2)
                         }
-                        .buttonStyle(.bordered)
-                        .buttonBorderShape(.capsule)
-                        .padding(2)
-                        .contextMenu{
-                            Button("Delete", systemImage: "trash", role: .destructive){
-                                yAxis.remove(tag)
-                                if xAxis == tag { xAxis = nil }
-                                modelContext.delete(tag)
+                        ForEach(tags.filter{$0 != xAxis}){tag in
+                            let tagState : TagState = xAxis == tag ? .x : yAxis.contains(tag) ? .y : .none
+                            Button{
+                                if xAxis == nil {
+                                    yAxis.remove(tag)
+                                    xAxis = tag
+                                } else if yAxis.contains(tag) {
+                                    yAxis.remove(tag)
+                                } else {
+                                    yAxis.insert(tag)
+                                }
+                            } label: {
+                                HStack{
+                                    Text(tag.name)
+                                    if xAxis != nil {
+                                        Spacer()
+                                        Text(tagState == .x ? "X" : tagState == .y ? "Y" : "")
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(2)
+                            }
+                            .buttonStyle(.bordered)
+                            .buttonBorderShape(.capsule)
+                            .padding(2)
+                            .contextMenu{
+                                Button("Delete", systemImage: "trash", role: .destructive){
+                                    yAxis.remove(tag)
+                                    if xAxis == tag { xAxis = nil }
+                                    modelContext.delete(tag)
+                                }
                             }
                         }
                     }
                 }
+                .scrollIndicators(.hidden)
+                .scrollClipDisabled()
             }
-            .scrollIndicators(.hidden)
-            .scrollClipDisabled()
         }
         .animation(.spring, value: xAxis)
         .animation(.spring, value: yAxis)

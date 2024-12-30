@@ -6,7 +6,5 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>Your health data is used to display it in this app</string>
 </dict>
 </plist>
