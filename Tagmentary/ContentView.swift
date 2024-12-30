@@ -30,50 +30,54 @@ struct ContentView: View {
                 }
             tagPicker
 
-            chart
-                .overlay(alignment: .leading){
-                    HStack{
-                        Text("<- ")
-                        if yAxis.isEmpty {
-                            Text("Select a Tag to show")
+            if tags.isEmpty {
+                ContentUnavailableView("No Tags", systemImage: "mappin.circle", description: Text("Add some Tags or configure automatic sleep imports in Settings"))
+            } else {
+                chart
+                    .overlay(alignment: .leading){
+                        HStack{
+                            Text("<- ")
+                            if yAxis.isEmpty {
+                                Text("Select a Tag to show")
+                            }
+                            Text(Array(yAxis.map{String($0.name.prefix(10))}.prefix(4)), format: .list(type: .and)) + Text(yAxis.count > 4 ? ", ..." : "")
+                            Text("->")
                         }
-                        Text(Array(yAxis.map{String($0.name.prefix(10))}.prefix(4)), format: .list(type: .and)) + Text(yAxis.count > 4 ? ", ..." : "")
-                        Text("->")
+                        .font(.system(size: 10))
+                        .fixedSize()
+                        .compositingGroup()
+                        .rotationEffect(.degrees(-90))
+                        .frame(width: 20)
                     }
-                    .font(.system(size: 10))
-                    .fixedSize()
-                    .compositingGroup()
-                    .rotationEffect(.degrees(-90))
-                    .frame(width: 20)
-                }
-                .overlay{
-                    if events.isEmpty {
-                        ContentUnavailableView("No Events", systemImage: "mappin.circle", description: Text("Add Events to track anything and their effects on each other"))
+                    .overlay{
+                        if events.isEmpty {
+                            ContentUnavailableView("No Events", systemImage: "mappin.circle", description: Text("Add Events to track anything and their effects on each other"))
+                        }
                     }
+                HStack{
+                    Text(" <- ")
+                    Text(xAxis?.name ?? "Select a Tag to show")
+                    Text(" -> ")
                 }
-            HStack{
-                Text(" <- ")
-                Text(xAxis?.name ?? "Select a Tag to show")
-                Text(" -> ")
-            }
-            .font(.system(size: 10))
-            .padding(.bottom)
+                .font(.system(size: 10))
+                .padding(.bottom)
 
-            VStack{
-                Button("Events"){
-                    showingEvents = true
+                VStack{
+                    Button("Events"){
+                        showingEvents = true
+                    }
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.capsule)
+                    .background()
+                    .clipShape(.capsule)
+                    Button("Add Event", systemImage: "plus"){
+                        showingAddEvent = true
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.capsule)
+                    .background()
+                    .clipShape(.capsule)
                 }
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.capsule)
-                .background()
-                .clipShape(.capsule)
-                Button("Add Event", systemImage: "plus"){
-                    showingAddEvent = true
-                }
-                .buttonStyle(.borderedProminent)
-                .buttonBorderShape(.capsule)
-                .background()
-                .clipShape(.capsule)
             }
         }
         .animation(.smooth, value: events)
@@ -145,9 +149,7 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
             .padding(.horizontal, 10)
-            if tags.isEmpty {
-                ContentUnavailableView("No Tags", systemImage: "mappin.circle", description: Text("Add some Tags or configure automatic sleep imports in Settings"))
-            } else {
+            if !tags.isEmpty {
                 if xAxis == nil {
                     Text("Select a Tag to show on the X axis")
                         .padding(.top)
